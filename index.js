@@ -4,10 +4,22 @@ const { correctRecipients, correctMessage } = require('./utils');
 
 async function run() {
   try {
-    const issueNumber = github.context.payload.issue.number;
     const owner = github.context.repo.owner;
     const repo = github.context.repo.repo;
     const label = github.context.payload.label.name;
+
+    // Check if issue or PR
+    const payload = github.context.payload;
+    var issueNumber;
+
+    if (payload.pull_request) {
+      issueNumber = payload.pull_request.number;
+    } else if (payload.issue) {
+      issueNumber = payload.issue.number;
+    } else {
+      console.log("Payload doesn't have an issue or pull request.");
+      return;
+    }
 
     // https://help.github.com/en/actions/automating-your-workflow-with-github-actions/authenticating-with-the-github_token#about-the-github_token-secret
     const token = core.getInput('token');
